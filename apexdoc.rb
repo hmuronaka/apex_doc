@@ -93,15 +93,14 @@ def main
 
   if paths.size == 1
    cls = apexdoc.get_cls(paths[0])
-    `open #{URL}#{cls.href}`
 
     if is_show_methods
       cls.methods.each do |method|
         puts method
       end
+    else
+      `open #{URL}#{cls.href}`
     end
-
- 
 
   elsif paths.size == 2
     cls = apexdoc.get_cls(paths[0])
