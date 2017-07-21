@@ -33,7 +33,7 @@ class NamespaceWrapper < NodeWrapper
   def get_cls(name)
     self["children"].each do |cls|
       if cls["text"] =~ /^#{name} Class$/i
-        return ClassWrapper.new(cls, NodeWrapper.new(self))
+        return ClassWrapper.new(cls, self)
       end
     end
     return nil
@@ -51,7 +51,7 @@ class ClassWrapper < NodeWrapper
     self["children"].each do |category|
       category["children"].each do |item|
         if item["text"] =~ /^#{name}\(/i
-          return NodeWrapper.new(item)
+          return NodeWrapper.new(item, self)
         end
       end
     end
@@ -93,7 +93,7 @@ class ApexDoc
     self.apex_reference()["children"].each do |namespace|
       namespace["children"].each do |cls|
          if cls["text"] =~ /^#{name} Class$/i
-           return ClassWrapper.new(cls, NodeWrapper.new(namespace))
+           return ClassWrapper.new(cls, NamespaceWrapper.new(namespace))
          end
       end
     end
