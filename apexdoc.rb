@@ -87,7 +87,7 @@ def main
 
   paths = ARGV[0].split(/\./)
 
-  is_show_methods = (ARGV[1] == "--show_methods")
+  is_show_methods = (ARGV[1] == "--show-methods")
 
   apexdoc = ApexDoc.new('apexdoc.json')
 
