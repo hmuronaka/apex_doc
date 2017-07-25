@@ -20,7 +20,7 @@ class NodeWrapper < SimpleDelegator
   end
 
   def name
-    return self["text"]
+    return self["text"].gsub(/​/, "")
   end
 end
 
@@ -32,8 +32,9 @@ class NamespaceWrapper < NodeWrapper
 
   def get_cls(name)
     self["children"].each do |cls|
-      if cls["text"] =~ /^#{name} Class$/i
-        return ClassWrapper.new(cls, self)
+      wrapper = ClassWrapper.new(cls, self)
+      if wrapper.name =~ /^#{name} Class$/i
+        return wrapper
       end
     end
     return nil
@@ -50,8 +51,9 @@ class ClassWrapper < NodeWrapper
   def method_or_property(name)
     self["children"].each do |category|
       category["children"].each do |item|
-        if item["text"] =~ /^#{name}\(/i
-          return NodeWrapper.new(item, self)
+        wrapper = NodeWrapper.new(item, self)
+        if wrapper.name =~ /^#{name}\(/i
+          return wrapper
         end
       end
     end
@@ -62,7 +64,8 @@ class ClassWrapper < NodeWrapper
     methods = []
     self["children"].each do |category|
       category["children"].each do |item|
-        methods << item["text"]
+        wrapper = NodeWrapper.new(item)
+        methods << wrapper.name
       end
     end
     methods
@@ -82,8 +85,9 @@ class ApexDoc
 
   def namespace(name)
     self.apex_reference()["children"].each do |namespace|
-      if namespace["text"] =~ /^#{name}\b/i
-        return NamespaceWrapper.new(namespace)
+      wrapper = NamespaceWrapper(namespace)
+      if wrapper.name =~ /^#{name}\b/i
+        return wrapper
       end
     end
     return nil
@@ -91,9 +95,10 @@ class ApexDoc
 
   def get_cls(name)
     self.apex_reference()["children"].each do |namespace|
-      namespace["children"].each do |cls|
-         if cls["text"] =~ /^#{name} Class$/i
-           return ClassWrapper.new(cls, NamespaceWrapper.new(namespace))
+      namespace["children"].find do |cls|
+         wrapper = ClassWrapper.new(cls, NamespaceWrapper.new(namespace))
+         if wrapper.name =~ /^#{name} Class$/
+           return wrapper
          end
       end
     end
